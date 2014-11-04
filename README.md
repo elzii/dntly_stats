@@ -2,6 +2,9 @@ dntly_stats
 ===========
 Grab stats from public API endpoints and display them visually
 
+![Donately Stats](http://i.imgur.com/C7Qxyzg.png)
+
+
 ## Usage
 
 ```
