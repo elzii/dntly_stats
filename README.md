@@ -1,5 +1,6 @@
 dntly_stats
 ===========
+Grab stats from public API endpoints and display them visually
 
 ## Usage
 
