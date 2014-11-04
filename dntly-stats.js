@@ -6,64 +6,94 @@ var DNTLY_STATS = DNTLY_STATS || (function(){
         init : function(Args) {
             _args = Args;
             
-            _args.campaign_id = Args.campaign_id;
+
+            _args.campaign_id = Args.campaign_id || '1';
+            _args.orientation = Args.orientation || 'vertical';
+            _args.css         = Args.css || true;
+
+
+            // Set orientation attribute conditionally
+            var orientation_attr;
+
+            if ( _args.orientation === 'vertical' ) {
+            	orientation_attr = 'height';
+            } else {
+            	orientation_attr = 'width';
+            }
+
 
             // Styles
-            var css = document.createElement("style");
-            	css.type = "text/css";
-            	css.innerHTML = ' \
-            		#dntly-stats, #dntly-stats * { \
-            			-webkit-box-sizing: border-box; \
-            			-moz-box-sizing: border-box; \
-            			box-sizing: border-box; \
-            		} \
-            		#dntly-stats { \
-            			position:relative; \
-            			width:200px; \
-            			height:380px; \
-            			text-align:right; \
-            			font-family: "Hevetica Neue", Helvetica, Arial, sans-serif; \
-            			font-size: 12px; \
-            			text-transform: uppercase; \
-            			font-weight: bold; \
-            		} \
-            		#dntly-stats .goal-amount { \
-            			position:absolute; \
-            			top:0;left:0; \
-            			text-align:center; \
-            			width:100%; \
-            			height:40px; \
-            			line-height:40px; \
-            		} \
-            		#dntly-stats .amount-raised { \
-            			color: white; \
-            			width:100%; \
-            			height:40px; \
-            			line-height:40px; \
-            			text-align: center;	 \
-            		} \
-            		#dntly-stats .bar { \
-            			display:inline-block; \
-            			position:relative; \
-            			background-color: #eff1f5; \
-            			border-radius: 3px; \
-            			width:80px; \
-            			height:100%; \
-            		} \
-            		#dntly-stats .bar .bar--progress { \
-            			position:absolute; \
-            			left:0;bottom:0; \
-            			background-color: #678ec2; \
-            			border-radius: 0 0 3px 3px; \
-            			height:0%; \
-            			width:100%; \
-            			-webkit-transition: height 250ms linear; \
-            			-o-transition: height 250ms linear; \
-            			transition: height 250ms linear; \
-            		} \
-            	';
+            if ( _args.css ) {
 
-            document.body.appendChild(css);
+	            var css = document.createElement("style");
+	            	css.type = "text/css";
+	            	css.innerHTML = ' \
+	            		.dntly-stats, .dntly-stats * { \
+	            			-webkit-box-sizing: border-box; \
+	            			-moz-box-sizing: border-box; \
+	            			box-sizing: border-box; \
+	            		} \
+	            		.dntly-stats { \
+	            			position:relative; \
+	            			width:auto; \
+	            			height:auto; \
+	            			font-family: "Hevetica Neue", Helvetica, Arial, sans-serif; \
+	            			font-size: 12px; \
+	            			text-transform: uppercase; \
+	            			font-weight: bold; \
+	            		} \
+	            		.dntly-stats .goal-amount { \
+	            			position:absolute; \
+	            			top:0;left:0; \
+	            			text-align:center; \
+	            			width:100%; \
+	            			line-height:40px; \
+	            		} \
+	            		.dntly-stats .amount-raised { \
+	            			color: white; \
+	            			width:100%; \
+	            			line-height:40px; \
+	            			text-align: center;	 \
+	            		} \
+	            		.dntly-stats .bar { \
+	            			display:inline-block; \
+	            			position:relative; \
+	            			background-color: #eff1f5; \
+	            			border-radius: 3px; \
+	            			width:80px; \
+	            			height:380px; \
+	            		} \
+	            		.dntly-stats .bar .bar--progress { \
+	            			position:absolute; \
+	            			left:0;bottom:0; \
+	            			background-color: #678ec2; \
+	            			border-radius: 0 0 3px 3px; \
+	            			height:0%; \
+	            			width:100%; \
+	            			-webkit-transition: height 250ms linear, width 250ms linear; \
+	            			-o-transition: height 250ms linear, width 250ms linear; \
+	            			transition: height 250ms linear, width 250ms linear; \
+	            		} \
+	            		.dntly-stats.horizontal .bar { \
+	            			width:380px; \
+	            			height:50px; \
+	            		} \
+	            		.dntly-stats.horizontal .bar .bar--progress { \
+	            			height:100%; \
+	            			width:0%; \
+	            		} \
+	            		.dntly-stats.horizontal .amount-raised { \
+	            			line-height:50px; \
+	            		} \
+	            		.dntly-stats.horizontal .goal-amount { \
+	            			line-height:50px; \
+	            			text-align: right; \
+	            			padding-right: 15px; \
+	            		} \
+	            	';
+
+	            document.body.appendChild(css);
+	        }
 
 
             function sendRequest(url,callback,postData) {
@@ -118,42 +148,51 @@ var DNTLY_STATS = DNTLY_STATS || (function(){
 
             	var percent_raised = (json.amount_raised / json.campaign_goal) * 100;
 
+            	var random_id      = 'dntly-stats-id__'+Math.floor((Math.random() * 100) + 1);
+
             	// Create & append parent node
             	document['body']
             		.appendChild(document.createElement('div'))
-            		.setAttribute('id', 'dntly-stats')
+            		.setAttribute('id', random_id)
+
+            	document.getElementById(random_id)
+            		.setAttribute('class', 'dntly-stats')
+
+            	// Set orientation class
+            	document.querySelector('#'+random_id)
+            		.className = document.querySelector('#'+random_id).className + ' ' + _args.orientation
 
             	// Create & append child nodes
-            	document.getElementById('dntly-stats')
+            	document.querySelector('#'+random_id)
             		.appendChild(document.createElement('div'))
             		.setAttribute('class', 'bar')
 
-            	document.querySelector('#dntly-stats .bar')
+            	document.querySelector('#'+random_id+' .bar')
             		.appendChild(document.createElement('div'))
             		.setAttribute('class', 'goal-amount')
 
-            	document.querySelector('#dntly-stats .bar')
+            	document.querySelector('#'+random_id+' .bar')
             		.appendChild(document.createElement('div'))
             		.setAttribute('class', 'bar--progress')
 
-            	document.querySelector('#dntly-stats .bar--progress')
+            	document.querySelector('#'+random_id+' .bar--progress')
             		.appendChild(document.createElement('div'))
             		.setAttribute('class', 'amount-raised')
 
 
             	// Append some data immediatly
-            	document.querySelector('#dntly-stats .goal-amount')
+            	document.querySelector('#'+random_id+' .goal-amount')
             		.innerHTML = '$'+json.campaign_goal.toFixed(0);
 
-            	document.querySelector('#dntly-stats .amount-raised')
+            	document.querySelector('#'+random_id+' .amount-raised')
             		.innerHTML = '$'+json.amount_raised.toFixed(0);
 
             	// Append data after timeout
             	setTimeout(function() {
 
             		// Set percent raised as height
-            		document.querySelector('#dntly-stats .bar--progress')
-            			.setAttribute('style', 'height:'+percent_raised+'%');
+            		document.querySelector('#'+random_id+' .bar--progress')
+            			.setAttribute('style', orientation_attr+':'+percent_raised+'%');
 
             	}, 50)
 
